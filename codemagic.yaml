@@ -13,7 +13,7 @@ workflows:
     scripts:
       - name: Increment build number
         script: |
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "Useless Radio/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "Useless Radio/Info.plist" || true
       - name: Set up code signing
         script: xcode-project use-profiles
       - name: Clean everything
