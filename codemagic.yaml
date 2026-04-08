@@ -1,0 +1,32 @@
+workflows:
+  ios-testflight:
+    name: iOS to TestFlight
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Dom Collective Key
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.uselessradio.app
+      xcode: 16.2
+    scripts:
+      - name: Increment build number
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "Useless Radio/Info.plist"
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Clean everything
+        script: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData/
+          xcodebuild clean -project "Useless Radio.xcodeproj" -scheme "Useless Radio" -configuration Release
+      - name: Archive
+        script: xcodebuild -project "Useless Radio.xcodeproj" -scheme "Useless Radio" -configuration Release -destination "generic/platform=iOS" -archivePath build/ios/xcarchive/UselessRadio.xcarchive -derivedDataPath build/DerivedData archive CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=QXSKCPNT8B CODE_SIGN_IDENTITY="Apple Distribution" PROVISIONING_PROFILE="ba4d1dfb-8e32-44db-821f-878c12b6cae1"
+      - name: Export ipa
+        script: xcodebuild -exportArchive -archivePath build/ios/xcarchive/UselessRadio.xcarchive -exportOptionsPlist /Users/builder/export_options.plist -exportPath build/ios/ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
