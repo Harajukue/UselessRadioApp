@@ -15,7 +15,6 @@
 		20AE2B532F87020100126950 /* Useless_RadioUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE2B522F87020100126950 /* Useless_RadioUITestsLaunchTests.swift */; };
 		20AE2B602F87024A00126950 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE2B5F2F87024A00126950 /* AppDelegate.swift */; };
 		20AE2B642F87025700126950 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE2B632F87025700126950 /* SceneDelegate.swift */; };
-		20AE2B662F87025D00126950 /* SETUP_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 20AE2B652F87025C00126950 /* SETUP_GUIDE.md */; };
 		20AE2B682F87026700126950 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE2B672F87026600126950 /* ViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,10 +45,9 @@
 		20AE2B4C2F87020100126950 /* Useless RadioUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Useless RadioUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20AE2B502F87020100126950 /* Useless_RadioUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Useless_RadioUITests.swift; sourceTree = "<group>"; };
 		20AE2B522F87020100126950 /* Useless_RadioUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Useless_RadioUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		20AE2B5F2F87024A00126950 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "../../../WebProjects/useless radio/UselessRadioApp/AppDelegate.swift"; sourceTree = "<group>"; };
-		20AE2B632F87025700126950 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "../../../WebProjects/useless radio/UselessRadioApp/SceneDelegate.swift"; sourceTree = "<group>"; };
-		20AE2B652F87025C00126950 /* SETUP_GUIDE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = SETUP_GUIDE.md; path = "../../../WebProjects/useless radio/UselessRadioApp/SETUP_GUIDE.md"; sourceTree = "<group>"; };
-		20AE2B672F87026600126950 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = "../../../WebProjects/useless radio/UselessRadioApp/ViewController.swift"; sourceTree = "<group>"; };
+		20AE2B5F2F87024A00126950 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		20AE2B632F87025700126950 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		20AE2B672F87026600126950 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,7 +99,6 @@
 			isa = PBXGroup;
 			children = (
 				20AE2B5F2F87024A00126950 /* AppDelegate.swift */,
-				20AE2B652F87025C00126950 /* SETUP_GUIDE.md */,
 				20AE2B672F87026600126950 /* ViewController.swift */,
 				20AE2B632F87025700126950 /* SceneDelegate.swift */,
 				20AE2B352F8701FE00126950 /* Main.storyboard */,
@@ -233,7 +230,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20AE2B662F87025D00126950 /* SETUP_GUIDE.md in Resources */,
 				20AE2B3C2F87020000126950 /* LaunchScreen.storyboard in Resources */,
 				20AE2B392F87020000126950 /* Assets.xcassets in Resources */,
 				20AE2B372F8701FE00126950 /* Main.storyboard in Resources */,
