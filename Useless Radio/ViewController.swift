@@ -5,7 +5,7 @@ import SafariServices
 class ViewController: UIViewController {
 
     // MARK: - Config
-    private let websiteURL = URL(string: "https://useless.radio")!
+    private let websiteURL = URL(string: "https://uselessradio.com")!
 
     // MARK: - UI
     var webView: WKWebView!
@@ -24,6 +24,7 @@ class ViewController: UIViewController {
         config.defaultWebpagePreferences = prefs
 
         config.websiteDataStore = WKWebsiteDataStore.default()
+        config.userContentController.add(self, name: "retryLoad")
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
@@ -179,11 +180,20 @@ extension ViewController: WKNavigationDelegate {
         align-items:center;justify-content:center;height:100vh;text-align:center;color:#555;background:#000;">
         <h2 style="color:#fff;">You're offline</h2>
         <p style="color:#aaa;">Check your connection and try again.</p>
-        <button onclick="window.location.reload()" style="padding:12px 24px;border-radius:8px;
-        border:none;background:#fff;color:#000;font-size:16px;margin-top:16px;">Retry</button>
+        <button onclick="window.webkit.messageHandlers.retryLoad.postMessage(null)"
+        style="padding:12px 24px;border-radius:8px;border:none;background:#fff;color:#000;font-size:16px;margin-top:16px;">Retry</button>
         </body></html>
         """
         webView.loadHTMLString(html, baseURL: nil)
+    }
+}
+
+// MARK: - WKScriptMessageHandler
+extension ViewController: WKScriptMessageHandler {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == "retryLoad" {
+            loadWebsite()
+        }
     }
 }
 
