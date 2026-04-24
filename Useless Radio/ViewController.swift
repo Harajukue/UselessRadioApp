@@ -190,9 +190,11 @@ extension ViewController: WKNavigationDelegate {
             return
         }
 
-        // Merch store: open in external Safari so checkout and Apple Pay work
+        // Merch store: open in external Safari so checkout and Apple Pay work.
+        // Only intercept explicit user taps — not background/programmatic navigations on load.
         if (host == "uselessradio.com" || host.hasSuffix(".uselessradio.com"))
-            && url.path.hasPrefix("/store") {
+            && url.path.hasPrefix("/store")
+            && navigationAction.navigationType == .linkActivated {
             UIApplication.shared.open(url)
             decisionHandler(.cancel)
             return
