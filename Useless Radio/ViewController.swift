@@ -15,6 +15,8 @@ class ViewController: UIViewController {
 
     // Held until the page finishes loading, then injected
     private var pendingApnsToken: String?
+    // Set after the initial page load completes so store intercept doesn't fire on startup
+    private var hasFinishedInitialLoad = false
 
     // MARK: - Lifecycle
     override func loadView() {
@@ -151,6 +153,7 @@ extension ViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        hasFinishedInitialLoad = true
         loadingIndicator.stopAnimating()
         injectApnsTokenIfReady()
     }
@@ -190,11 +193,11 @@ extension ViewController: WKNavigationDelegate {
             return
         }
 
-        // Merch store: open in external Safari so checkout and Apple Pay work.
-        // Only intercept explicit user taps — not background/programmatic navigations on load.
+        // Merch store: open in the default browser — no in-app window at all.
+        // Guard with hasFinishedInitialLoad so page-load redirects don't fire this.
         if (host == "uselessradio.com" || host.hasSuffix(".uselessradio.com"))
             && url.path.hasPrefix("/store")
-            && navigationAction.navigationType == .linkActivated {
+            && hasFinishedInitialLoad {
             UIApplication.shared.open(url)
             decisionHandler(.cancel)
             return
@@ -249,10 +252,16 @@ extension ViewController: WKUIDelegate {
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
-        if let url = navigationAction.request.url {
-            let safari = SFSafariViewController(url: url)
-            present(safari, animated: true)
+        guard let url = navigationAction.request.url else { return nil }
+        let host = url.host ?? ""
+        // Store links via window.open() — send straight to external browser, no popup
+        if (host == "uselessradio.com" || host.hasSuffix(".uselessradio.com"))
+            && url.path.hasPrefix("/store") {
+            UIApplication.shared.open(url)
+            return nil
         }
+        let safari = SFSafariViewController(url: url)
+        present(safari, animated: true)
         return nil
     }
 
