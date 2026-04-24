@@ -15,8 +15,6 @@ class ViewController: UIViewController {
 
     // Held until the page finishes loading, then injected
     private var pendingApnsToken: String?
-    // Set after the initial page load completes so store intercept doesn't fire on startup
-    private var hasFinishedInitialLoad = false
 
     // MARK: - Lifecycle
     override func loadView() {
@@ -153,7 +151,6 @@ extension ViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        hasFinishedInitialLoad = true
         loadingIndicator.stopAnimating()
         injectApnsTokenIfReady()
     }
@@ -193,11 +190,9 @@ extension ViewController: WKNavigationDelegate {
             return
         }
 
-        // Merch store: open in the default browser — no in-app window at all.
-        // Guard with hasFinishedInitialLoad so page-load redirects don't fire this.
+        // Merch store: always open in the default browser, never in-app.
         if (host == "uselessradio.com" || host.hasSuffix(".uselessradio.com"))
-            && url.path.hasPrefix("/store")
-            && hasFinishedInitialLoad {
+            && url.path.hasPrefix("/store") {
             UIApplication.shared.open(url)
             decisionHandler(.cancel)
             return
