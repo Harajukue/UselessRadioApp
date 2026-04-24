@@ -13,6 +13,9 @@ class ViewController: UIViewController {
     private var progressView: UIProgressView!
     private var progressObserver: NSKeyValueObservation?
 
+    // Held until the page finishes loading, then injected
+    private var pendingApnsToken: String?
+
     // MARK: - Lifecycle
     override func loadView() {
         let config = WKWebViewConfiguration()
@@ -25,6 +28,7 @@ class ViewController: UIViewController {
 
         config.websiteDataStore = WKWebsiteDataStore.default()
         config.userContentController.add(self, name: "retryLoad")
+        config.userContentController.add(self, name: "storeApnsToken")
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
@@ -34,7 +38,6 @@ class ViewController: UIViewController {
         // Spoof Safari UA — fixes Google's "disallowed_useragent" OAuth block
         webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
 
-        // Use safe area so content doesn't hide under the status bar
         super.loadView()
         view.backgroundColor = .black
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -52,12 +55,40 @@ class ViewController: UIViewController {
         setupProgressBar()
         setupLoadingIndicator()
         setupRefreshControl()
+        observeApnsToken()
         loadWebsite()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    // MARK: - APNs token bridge
+
+    private func observeApnsToken() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleApnsToken(_:)),
+            name: .apnsTokenReceived,
+            object: nil
+        )
+    }
+
+    @objc private func handleApnsToken(_ notification: Foundation.Notification) {
+        guard let token = notification.userInfo?["token"] as? String else { return }
+        pendingApnsToken = token
+        injectApnsTokenIfReady()
+    }
+
+    private func injectApnsTokenIfReady() {
+        guard let token = pendingApnsToken else { return }
+        let js = "window.nativeApnsToken = '\(token)'; if (typeof window.onNativeApnsToken === 'function') window.onNativeApnsToken('\(token)');"
+        webView.evaluateJavaScript(js, completionHandler: nil)
     }
 
     // MARK: - Setup
@@ -121,6 +152,7 @@ extension ViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         loadingIndicator.stopAnimating()
+        injectApnsTokenIfReady()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -154,7 +186,14 @@ extension ViewController: WKNavigationDelegate {
         ]
 
         if url.scheme == "uselessradio" {
-            // OAuth callback deep link — let SceneDelegate handle it
+            decisionHandler(.cancel)
+            return
+        }
+
+        // Merch store: open in external Safari so checkout and Apple Pay work
+        if (host == "uselessradio.com" || host.hasSuffix(".uselessradio.com"))
+            && url.path.hasPrefix("/store") {
+            UIApplication.shared.open(url)
             decisionHandler(.cancel)
             return
         }
@@ -191,8 +230,13 @@ extension ViewController: WKNavigationDelegate {
 // MARK: - WKScriptMessageHandler
 extension ViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == "retryLoad" {
+        switch message.name {
+        case "retryLoad":
             loadWebsite()
+        case "storeApnsToken":
+            break
+        default:
+            break
         }
     }
 }
